@@ -24,38 +24,37 @@ def scan():
     return found_devices
 
 def find(interactive=True):
-    """
-    Smart Selector:
-    1. If 0 devices found -> Returns None
-    2. If 1 device found  -> Returns that device dict automatically
-    3. If >1 devices found -> 
-       - If interactive=True: Asks user to type a number to select.
-       - If interactive=False: Returns the first one found.
-    """
     devices = scan()
+    
+    selected = None
     
     if len(devices) == 0:
         return None
     
-    if len(devices) == 1:
-        # Auto-select the only one
-        return devices[0]
-    
-    # --- Multiple Devices Logic ---
-    if not interactive:
-        return devices[0]
+    elif len(devices) == 1:
+        selected = devices[0]
+        
+    else:
+        # Multiple found
+        if not interactive:
+            selected = devices[0]
+        else:
+            print(f"\n⚠️  Found {len(devices)} micro:bits:")
+            for i, dev in enumerate(devices):
+                # Show Serial number to help user choose, but don't return it
+                print(f"   [{i}] Port: {dev['port']} | Serial: {dev['serial_number']}")
+            
+            while True:
+                selection = input("\n   Select device number (0-9): ")
+                try:
+                    index = int(selection)
+                    if 0 <= index < len(devices):
+                        selected = devices[index]
+                        break
+                    print("   ❌ Number out of range.")
+                except ValueError:
+                    print("   ❌ Invalid input.")
 
-    print(f"\n⚠️  Found {len(devices)} micro:bits:")
-    for i, dev in enumerate(devices):
-        print(f"   [{i}] Port: {dev['port']} | Serial: {dev['serial_number']}")
-    
-    while True:
-        selection = input("\n   Select device number (0-9): ")
-        try:
-            index = int(selection)
-            if 0 <= index < len(devices):
-                return devices[index]
-            else:
-                print("   ❌ Number out of range.")
-        except ValueError:
-            print("   ❌ Invalid input. Please enter a number.")
+    # --- THE MAGIC CHANGE ---
+    # Instead of returning the whole dict, we just return the port string
+    return selected['port']
