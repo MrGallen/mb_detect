@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='mb_detect', 
-    version='0.1.1',
+    version='1.0.0',
     description='A smart serial port detector for BBC micro:bit',
     long_description=README,
     long_description_content_type="text/markdown",
