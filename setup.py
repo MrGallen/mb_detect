@@ -15,7 +15,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/mrgallen/mb_detect", # Update this if you have a github
     author="Eoin Gallen",
-    email="egallen@sainteunans.com"
+    author_email="egallen@sainteunans.com"
     license="MIT",
     py_modules=['mb_detect'],
     install_requires=['pyserial'],
