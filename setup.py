@@ -9,12 +9,13 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='mb_detect', 
-    version='0.1.0',
+    version='0.1.1',
     description='A smart serial port detector for BBC micro:bit',
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/egallen/mb_detect", # Update this if you have a github
+    url="https://github.com/mrgallen/mb_detect", # Update this if you have a github
     author="Eoin Gallen",
+    email="egallen@sainteunans.com"
     license="MIT",
     py_modules=['mb_detect'],
     install_requires=['pyserial'],
