@@ -9,11 +9,11 @@ def scan():
     ports = serial.tools.list_ports.comports()
     
     for port in ports:
-        # Normalize descriptions for easier matching
+        # 1. check for the specific micro:bit Vendor ID (3368)
+        # 2. keep the string check as a backup for other OSs
         p_str = (str(port.description) + str(port.hwid)).lower()
         
-        # Check for standard micro:bit signatures
-        if "microbit" in p_str or "mbed" in p_str:
+        if port.vid == 3368 or "microbit" in p_str or "mbed" in p_str:
             device_info = {
                 "port": port.device,
                 "serial_number": port.serial_number,
