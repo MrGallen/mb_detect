@@ -2,11 +2,12 @@
 
 A lightweight Python utility to automatically detect and select BBC micro:bit devices connected via USB.
 
-It handles cross-platform port detection (Windows/Mac/Linux) and robustly manages scenarios where multiple micro:bits are connected simultaneously.
+It handles cross-platform port detection (Windows/Mac/Linux), robustly manages multiple devices, and can automatically create the serial connection for you.
 
 ## Features
 
-* **Auto-Detection:** Automatically finds the correct serial port (`COM3`, `/dev/ttyACM0`, etc.).
+* **Auto-Detection:** Automatically finds the correct serial port (`COM3`, `/dev/ttyACM0`, etc.) using hardware IDs (VID 3368).
+* **Direct Connection:** Can return a ready-to-use `serial.Serial` object in one line.
 * **Multi-Device Support:** Can detect multiple connected micro:bits.
 * **Smart Selection:**
     * If 1 device is found, it selects it automatically.
@@ -21,8 +22,34 @@ pip install mb_detect
 
 ## Usage
 
-### 1. The Easiest Way (Single micro:bit)
-If you only have one micro:bit plugged in, the tool will auto-select it and return the port string directly.
+### 1. The Recommended Way (Direct Connect)
+You can find and connect to the micro:bit in a single line. This returns a standard `serial.Serial` object, so you can use all standard PySerial methods (`write`, `readline`, `flush`, etc.) immediately.
+
+You can also pass standard PySerial arguments (like `timeout`) directly to this function.
+
+```python
+import mb_detect
+import time
+
+# Finds the micro:bit and connects with a 2-second timeout
+ser = mb_detect.connect(timeout=2)
+
+if ser:
+    print(f"✅ Connected to {ser.port}")
+    
+    # You can now use standard serial methods
+    ser.write(b'hello\n')
+    
+    response = ser.readline().decode().strip()
+    print(f"Received: {response}")
+    
+    ser.close()
+else:
+    print("❌ No micro:bit found or device is busy.")
+```
+
+### 2. Get Port String Only (Manual Connection)
+If you only want the port name (e.g., `"COM3"`) but want to handle the connection logic yourself, use `find()`.
 
 ```python
 import mb_detect
@@ -32,17 +59,13 @@ import serial
 port = mb_detect.find()
 
 if port:
-    print(f"Connected to {port}") 
-    # Example output: Connected to COM3
-    
-    # You can pass the variable directly to pyserial
+    print(f"Found micro:bit at {port}")
+    # You can pass this string to pyserial manually
     ser = serial.Serial(port, 115200)
-else:
-    print("No micro:bit found.")
 ```
 
-### 2. Handling Multiple micro:bits (Interactive)
-If you have multiple devices connected, the `find()` function will automatically pause the script and ask the user to choose one via the terminal input.
+### 3. Handling Multiple micro:bits (Interactive)
+If you have multiple devices connected, both `find()` and `connect()` will automatically pause the script and ask the user to choose one via the terminal.
 
 ```python
 # If 2 micro:bits are plugged in, this will print:
@@ -52,20 +75,20 @@ If you have multiple devices connected, the `find()` function will automatically
 #
 #    Select device number (0-9): 
 
-port = mb_detect.find()
-print(f"User selected: {port}")
+ser = mb_detect.connect()
+print(f"User selected: {ser.port}")
 ```
 
-### 3. Non-Interactive Mode (Automation)
+### 4. Non-Interactive Mode (Automation)
 If you are running a script in the background (e.g., a robot or server) and cannot accept user input, use `interactive=False`. It will default to the first available micro:bit found.
 
 ```python
-# Will not ask for input; just picks the first one found
-port = mb_detect.find(interactive=False)
+# Will not ask for input; just connects to the first one found
+ser = mb_detect.connect(interactive=False)
 ```
 
-### 4. Advanced: Get All Data
-If you need the Serial Number or want to connect to *all* micro:bits at once, use the `scan()` function. This returns the full data (not just the string).
+### 5. Advanced: Get All Data
+If you need the Serial Number or want to connect to *all* micro:bits at once, use the `scan()` function. This returns the full data list.
 
 ```python
 all_devices = mb_detect.scan()
