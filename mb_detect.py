@@ -90,3 +90,36 @@ def connect(baudrate=115200, interactive=True, **kwargs):
         print(f"❌ Error: Could not connect to {port}.")
         print("   (The device might be busy or open in another app like MakeCode)")
         return None
+
+def connect_multiple(limit=None, baudrate=115200, **kwargs):
+    """
+    Connects to multiple micro:bits simultaneously.
+    
+    Args:
+        limit (int): Max number of devices to connect to (default: None = connect all).
+        baudrate (int): Serial baudrate.
+        **kwargs: Extra serial args (e.g. timeout=0.1).
+        
+    Returns:
+        list: A list of open serial.Serial objects.
+    """
+    devices = scan()
+    connections = []
+    
+    if not devices:
+        return connections # Return empty list
+
+    # If limit is set, slice the list (e.g. only take first 2)
+    if limit:
+        devices = devices[:limit]
+        
+    for dev in devices:
+        try:
+            # Create connection for this specific device
+            conn = serial.Serial(dev['port'], baudrate=baudrate, **kwargs)
+            connections.append(conn)
+            # print(f"Connected to {dev['port']}") # Optional debug
+        except serial.SerialException:
+            print(f"❌ Warning: Could not connect to {dev['port']} (Busy?)")
+            
+    return connections
