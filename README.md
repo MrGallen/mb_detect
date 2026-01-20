@@ -103,6 +103,28 @@ for dev in all_devices:
     print(f"Found device at {dev['port']} with serial {dev['serial_number']}")
 ```
 
+### 6. Handling a Fleet (Multiple Connections)
+If you need to connect to **multiple** micro:bits simultaneously (e.g., a swarm of robots), use `connect_multiple()`. This returns a **list** of connected serial objects.
+
+```python
+import mb_detect
+
+# Connect to ALL connected micro:bits
+# IMPORTANT: Use a timeout so reading doesn't block the loop
+fleet = mb_detect.connect_multiple(timeout=0.1)
+
+print(f"Connected to {len(fleet)} devices.")
+
+# Loop through them to read data
+for ser in fleet:
+    if ser.in_waiting:
+        print(f"[{ser.port}] says: {ser.readline().decode().strip()}")
+
+# Close all
+for ser in fleet:
+    ser.close()
+```
+
 ## Requirements
 
 * Python 3.6+
